@@ -1,0 +1,936 @@
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	ms_count
+  18              		.bss
+  19              		.align	1
+  20              		.type	ms_count, %object
+  21              		.size	ms_count, 2
+  22              	ms_count:
+  23 0000 0000     		.space	2
+  24              		.global	comp_val1
+  25              		.align	1
+  26              		.type	comp_val1, %object
+  27              		.size	comp_val1, 2
+  28              	comp_val1:
+  29 0002 0000     		.space	2
+  30              		.global	comp_val2
+  31              		.data
+  32              		.align	1
+  33              		.type	comp_val2, %object
+  34              		.size	comp_val2, 2
+  35              	comp_val2:
+  36 0000 D007     		.short	2000
+  37              		.global	increment
+  38              		.type	increment, %object
+  39              		.size	increment, 1
+  40              	increment:
+  41 0002 01       		.byte	1
+  42 0003 00       		.section	.text.BLUE_ISR,"ax",%progbits
+  43              		.align	2
+  44              		.global	BLUE_ISR
+  45              		.code	16
+  46              		.thumb_func
+  47              		.type	BLUE_ISR, %function
+  48              	BLUE_ISR:
+  49              	.LFB33:
+  50              		.file 1 ".\\main.c"
+   1:.\main.c      **** // This project uses PWM to control the intensity of the 
+   2:.\main.c      **** // Red and Blue LEDs on the PSoC4 Pioneer Board. The PWM 
+   3:.\main.c      **** // has a 1kHz frequency and the duty cycle of each output 
+   4:.\main.c      **** // is adjusted using a 16-bit timer. The compare value for 
+   5:.\main.c      **** // each output is either incremented or decremented at a 
+   6:.\main.c      **** // frequency defined by UPDATE_PERIOD.
+   7:.\main.c      **** 
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 2
+
+
+   8:.\main.c      **** 
+   9:.\main.c      **** #include <project.h>
+  10:.\main.c      **** 
+  11:.\main.c      **** #define ON 0
+  12:.\main.c      **** #define OFF 1
+  13:.\main.c      **** #define UPDATE_PERIOD 4 //ms
+  14:.\main.c      **** #define COMPARE_VAL_MIN 51
+  15:.\main.c      **** #define COMPARE_VAL_MAX 11949
+  16:.\main.c      **** 
+  17:.\main.c      **** uint16 ms_count = 0;
+  18:.\main.c      **** uint16 comp_val1 = 0;
+  19:.\main.c      **** uint16 comp_val2 = 2000;
+  20:.\main.c      **** uint8 increment = 1;
+  21:.\main.c      **** 
+  22:.\main.c      **** /* functions to create
+  23:.\main.c      **** - go forward
+  24:.\main.c      **** - stop
+  25:.\main.c      **** - turn (angle, direction)
+  26:.\main.c      **** - slow down
+  27:.\main.c      ****  */
+  28:.\main.c      **** 
+  29:.\main.c      **** 
+  30:.\main.c      **** CY_ISR(BLUE_ISR) {
+  51              		.loc 1 30 0
+  52              		.cfi_startproc
+  53 0000 80B5     		push	{r7, lr}
+  54              	.LCFI0:
+  55              		.cfi_def_cfa_offset 8
+  56              		.cfi_offset 7, -8
+  57              		.cfi_offset 14, -4
+  58 0002 00AF     		add	r7, sp, #0
+  59              	.LCFI1:
+  60              		.cfi_def_cfa_register 7
+  31:.\main.c      **** 	Blue_LED_Write(ON);
+  61              		.loc 1 31 0
+  62 0004 0020     		mov	r0, #0
+  63 0006 FFF7FEFF 		bl	Blue_LED_Write
+  32:.\main.c      **** }
+  64              		.loc 1 32 0
+  65 000a BD46     		mov	sp, r7
+  66              		@ sp needed for prologue
+  67 000c 80BD     		pop	{r7, pc}
+  68              		.cfi_endproc
+  69              	.LFE33:
+  70              		.size	BLUE_ISR, .-BLUE_ISR
+  71 000e C046     		.section	.text.RED_ISR,"ax",%progbits
+  72              		.align	2
+  73              		.global	RED_ISR
+  74              		.code	16
+  75              		.thumb_func
+  76              		.type	RED_ISR, %function
+  77              	RED_ISR:
+  78              	.LFB34:
+  33:.\main.c      **** 
+  34:.\main.c      **** 
+  35:.\main.c      **** 
+  36:.\main.c      **** CY_ISR(RED_ISR) {
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 3
+
+
+  79              		.loc 1 36 0
+  80              		.cfi_startproc
+  81 0000 80B5     		push	{r7, lr}
+  82              	.LCFI2:
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 7, -8
+  85              		.cfi_offset 14, -4
+  86 0002 00AF     		add	r7, sp, #0
+  87              	.LCFI3:
+  88              		.cfi_def_cfa_register 7
+  37:.\main.c      **** 	Red_LED_Write(ON);
+  89              		.loc 1 37 0
+  90 0004 0020     		mov	r0, #0
+  91 0006 FFF7FEFF 		bl	Red_LED_Write
+  38:.\main.c      **** }
+  92              		.loc 1 38 0
+  93 000a BD46     		mov	sp, r7
+  94              		@ sp needed for prologue
+  95 000c 80BD     		pop	{r7, pc}
+  96              		.cfi_endproc
+  97              	.LFE34:
+  98              		.size	RED_ISR, .-RED_ISR
+  99 000e C046     		.section	.text.TC_ISR,"ax",%progbits
+ 100              		.align	2
+ 101              		.global	TC_ISR
+ 102              		.code	16
+ 103              		.thumb_func
+ 104              		.type	TC_ISR, %function
+ 105              	TC_ISR:
+ 106              	.LFB35:
+  39:.\main.c      **** 
+  40:.\main.c      **** CY_ISR(TC_ISR) {
+ 107              		.loc 1 40 0
+ 108              		.cfi_startproc
+ 109 0000 80B5     		push	{r7, lr}
+ 110              	.LCFI4:
+ 111              		.cfi_def_cfa_offset 8
+ 112              		.cfi_offset 7, -8
+ 113              		.cfi_offset 14, -4
+ 114 0002 00AF     		add	r7, sp, #0
+ 115              	.LCFI5:
+ 116              		.cfi_def_cfa_register 7
+  41:.\main.c      **** 	Blue_LED_Write(OFF);
+ 117              		.loc 1 41 0
+ 118 0004 0120     		mov	r0, #1
+ 119 0006 FFF7FEFF 		bl	Blue_LED_Write
+  42:.\main.c      **** 	Red_LED_Write(OFF);
+ 120              		.loc 1 42 0
+ 121 000a 0120     		mov	r0, #1
+ 122 000c FFF7FEFF 		bl	Red_LED_Write
+  43:.\main.c      **** }
+ 123              		.loc 1 43 0
+ 124 0010 BD46     		mov	sp, r7
+ 125              		@ sp needed for prologue
+ 126 0012 80BD     		pop	{r7, pc}
+ 127              		.cfi_endproc
+ 128              	.LFE35:
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 4
+
+
+ 129              		.size	TC_ISR, .-TC_ISR
+ 130              		.section	.text.MS_ISR,"ax",%progbits
+ 131              		.align	2
+ 132              		.global	MS_ISR
+ 133              		.code	16
+ 134              		.thumb_func
+ 135              		.type	MS_ISR, %function
+ 136              	MS_ISR:
+ 137              	.LFB36:
+  44:.\main.c      **** 
+  45:.\main.c      **** // This ISR updates the compare values at a frequency
+  46:.\main.c      **** // defined by UPDATE_PERIOD
+  47:.\main.c      **** CY_ISR(MS_ISR) {
+ 138              		.loc 1 47 0
+ 139              		.cfi_startproc
+ 140 0000 80B5     		push	{r7, lr}
+ 141              	.LCFI6:
+ 142              		.cfi_def_cfa_offset 8
+ 143              		.cfi_offset 7, -8
+ 144              		.cfi_offset 14, -4
+ 145 0002 00AF     		add	r7, sp, #0
+ 146              	.LCFI7:
+ 147              		.cfi_def_cfa_register 7
+  48:.\main.c      **** 	//comp_val1 = 5000;
+  49:.\main.c      ****     comp_val2 = 2000;
+ 148              		.loc 1 49 0
+ 149 0004 024B     		ldr	r3, .L5
+ 150 0006 FA22     		mov	r2, #250
+ 151 0008 D200     		lsl	r2, r2, #3
+ 152 000a 1A80     		strh	r2, [r3]
+  50:.\main.c      ****     /*
+  51:.\main.c      ****     ms_count++;
+  52:.\main.c      **** 	if(ms_count == UPDATE_PERIOD) {
+  53:.\main.c      **** 	
+  54:.\main.c      **** 		if(increment) {
+  55:.\main.c      **** 			comp_val1 += 50; // increment compare value 1
+  56:.\main.c      **** 			comp_val2 -= 50; // decrement compare value 2
+  57:.\main.c      **** 		}else{
+  58:.\main.c      **** 			comp_val1 -= 50; // decrement compare value 1
+  59:.\main.c      **** 			comp_val2 += 50; // increment compare value 2
+  60:.\main.c      **** 		}
+  61:.\main.c      **** 		
+  62:.\main.c      **** 		if(comp_val1 < COMPARE_VAL_MIN) { // make increment "true"
+  63:.\main.c      **** 			increment = 1;
+  64:.\main.c      **** 		}
+  65:.\main.c      **** 		if(comp_val1 > COMPARE_VAL_MAX) { // make decrement "true"
+  66:.\main.c      **** 			increment = 0;
+  67:.\main.c      **** 		}
+  68:.\main.c      **** 		ms_count = 0; // reset ms counter
+  69:.\main.c      **** 	}
+  70:.\main.c      ****     */
+  71:.\main.c      ****     
+  72:.\main.c      **** }
+ 153              		.loc 1 72 0
+ 154 000c BD46     		mov	sp, r7
+ 155              		@ sp needed for prologue
+ 156 000e 80BD     		pop	{r7, pc}
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 5
+
+
+ 157              	.L6:
+ 158              		.align	2
+ 159              	.L5:
+ 160 0010 00000000 		.word	comp_val2
+ 161              		.cfi_endproc
+ 162              	.LFE36:
+ 163              		.size	MS_ISR, .-MS_ISR
+ 164              		.section	.text.main,"ax",%progbits
+ 165              		.align	2
+ 166              		.global	main
+ 167              		.code	16
+ 168              		.thumb_func
+ 169              		.type	main, %function
+ 170              	main:
+ 171              	.LFB37:
+  73:.\main.c      **** 
+  74:.\main.c      **** int main()
+  75:.\main.c      **** {
+ 172              		.loc 1 75 0
+ 173              		.cfi_startproc
+ 174 0000 80B5     		push	{r7, lr}
+ 175              	.LCFI8:
+ 176              		.cfi_def_cfa_offset 8
+ 177              		.cfi_offset 7, -8
+ 178              		.cfi_offset 14, -4
+ 179 0002 00AF     		add	r7, sp, #0
+ 180              	.LCFI9:
+ 181              		.cfi_def_cfa_register 7
+  76:.\main.c      **** 	Timer_1_Start(); // Configure and enable ms timer
+ 182              		.loc 1 76 0
+ 183 0004 FFF7FEFF 		bl	Timer_1_Start
+  77:.\main.c      ****     PWM_1_Start(); // Configure and enable PWM module
+ 184              		.loc 1 77 0
+ 185 0008 FFF7FEFF 		bl	PWM_1_Start
+  78:.\main.c      **** 	
+  79:.\main.c      **** 	
+  80:.\main.c      **** 	blue_isr_StartEx(BLUE_ISR); // Point to BLUE_ISR to turn on the blue LED
+ 186              		.loc 1 80 0
+ 187 000c 0B4B     		ldr	r3, .L9
+ 188 000e 181C     		mov	r0, r3
+ 189 0010 FFF7FEFF 		bl	blue_isr_StartEx
+  81:.\main.c      **** 	red_isr_StartEx(RED_ISR); // Point to RED_ISR to turn on the red LED
+ 190              		.loc 1 81 0
+ 191 0014 0A4B     		ldr	r3, .L9+4
+ 192 0016 181C     		mov	r0, r3
+ 193 0018 FFF7FEFF 		bl	red_isr_StartEx
+  82:.\main.c      **** 	tc_isr_StartEx(TC_ISR); // Point to TC_ISR to turn off both LEDs
+ 194              		.loc 1 82 0
+ 195 001c 094B     		ldr	r3, .L9+8
+ 196 001e 181C     		mov	r0, r3
+ 197 0020 FFF7FEFF 		bl	tc_isr_StartEx
+  83:.\main.c      **** 	ms_isr_StartEx(MS_ISR); // Point to MS_ISR to update the compare values
+ 198              		.loc 1 83 0
+ 199 0024 084B     		ldr	r3, .L9+12
+ 200 0026 181C     		mov	r0, r3
+ 201 0028 FFF7FEFF 		bl	ms_isr_StartEx
+  84:.\main.c      **** 
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 6
+
+
+  85:.\main.c      ****     CyGlobalIntEnable; // Enable global interrupts
+ 202              		.loc 1 85 0
+ 203              	@ 85 ".\main.c" 1
+ 204 002c 62B6     		CPSIE   i
+ 205              	@ 0 "" 2
+ 206              		.code	16
+ 207              	.L8:
+  86:.\main.c      **** 	
+  87:.\main.c      ****     for(;;)
+  88:.\main.c      ****     {
+  89:.\main.c      ****         //PWM_1_WriteCompare1(comp_val1); // Write new compare value to PWM output 1
+  90:.\main.c      **** 		PWM_1_WriteCompare2(comp_val2); // Write new compare value to PWM output 2
+ 208              		.loc 1 90 0 discriminator 1
+ 209 002e 074B     		ldr	r3, .L9+16
+ 210 0030 1B88     		ldrh	r3, [r3]
+ 211 0032 181C     		mov	r0, r3
+ 212 0034 FFF7FEFF 		bl	PWM_1_WriteCompare2
+  91:.\main.c      ****     }
+ 213              		.loc 1 91 0 discriminator 1
+ 214 0038 F9E7     		b	.L8
+ 215              	.L10:
+ 216 003a C046     		.align	2
+ 217              	.L9:
+ 218 003c 00000000 		.word	BLUE_ISR
+ 219 0040 00000000 		.word	RED_ISR
+ 220 0044 00000000 		.word	TC_ISR
+ 221 0048 00000000 		.word	MS_ISR
+ 222 004c 00000000 		.word	comp_val2
+ 223              		.cfi_endproc
+ 224              	.LFE37:
+ 225              		.size	main, .-main
+ 226              		.text
+ 227              	.Letext0:
+ 228              		.file 2 "./Generated_Source/PSoC4/cytypes.h"
+ 229              		.section	.debug_info,"",%progbits
+ 230              	.Ldebug_info0:
+ 231 0000 57010000 		.4byte	0x157
+ 232 0004 0200     		.2byte	0x2
+ 233 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 234 000a 04       		.byte	0x4
+ 235 000b 01       		.uleb128 0x1
+ 236 000c 20000000 		.4byte	.LASF24
+ 237 0010 01       		.byte	0x1
+ 238 0011 28010000 		.4byte	.LASF25
+ 239 0015 38010000 		.4byte	.LASF26
+ 240 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 241 001d 00000000 		.4byte	0
+ 242 0021 00000000 		.4byte	0
+ 243 0025 00000000 		.4byte	.Ldebug_line0
+ 244 0029 02       		.uleb128 0x2
+ 245 002a 01       		.byte	0x1
+ 246 002b 06       		.byte	0x6
+ 247 002c 13010000 		.4byte	.LASF0
+ 248 0030 02       		.uleb128 0x2
+ 249 0031 01       		.byte	0x1
+ 250 0032 08       		.byte	0x8
+ 251 0033 B6000000 		.4byte	.LASF1
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 7
+
+
+ 252 0037 02       		.uleb128 0x2
+ 253 0038 02       		.byte	0x2
+ 254 0039 05       		.byte	0x5
+ 255 003a EF000000 		.4byte	.LASF2
+ 256 003e 02       		.uleb128 0x2
+ 257 003f 02       		.byte	0x2
+ 258 0040 07       		.byte	0x7
+ 259 0041 00010000 		.4byte	.LASF3
+ 260 0045 02       		.uleb128 0x2
+ 261 0046 04       		.byte	0x4
+ 262 0047 05       		.byte	0x5
+ 263 0048 E6000000 		.4byte	.LASF4
+ 264 004c 02       		.uleb128 0x2
+ 265 004d 04       		.byte	0x4
+ 266 004e 07       		.byte	0x7
+ 267 004f 6F000000 		.4byte	.LASF5
+ 268 0053 02       		.uleb128 0x2
+ 269 0054 08       		.byte	0x8
+ 270 0055 05       		.byte	0x5
+ 271 0056 00000000 		.4byte	.LASF6
+ 272 005a 02       		.uleb128 0x2
+ 273 005b 08       		.byte	0x8
+ 274 005c 07       		.byte	0x7
+ 275 005d 81000000 		.4byte	.LASF7
+ 276 0061 03       		.uleb128 0x3
+ 277 0062 04       		.byte	0x4
+ 278 0063 05       		.byte	0x5
+ 279 0064 696E7400 		.ascii	"int\000"
+ 280 0068 02       		.uleb128 0x2
+ 281 0069 04       		.byte	0x4
+ 282 006a 07       		.byte	0x7
+ 283 006b 0E000000 		.4byte	.LASF8
+ 284 006f 04       		.uleb128 0x4
+ 285 0070 69000000 		.4byte	.LASF9
+ 286 0074 02       		.byte	0x2
+ 287 0075 5B       		.byte	0x5b
+ 288 0076 30000000 		.4byte	0x30
+ 289 007a 04       		.uleb128 0x4
+ 290 007b 31010000 		.4byte	.LASF10
+ 291 007f 02       		.byte	0x2
+ 292 0080 5C       		.byte	0x5c
+ 293 0081 3E000000 		.4byte	0x3e
+ 294 0085 02       		.uleb128 0x2
+ 295 0086 04       		.byte	0x4
+ 296 0087 04       		.byte	0x4
+ 297 0088 98000000 		.4byte	.LASF11
+ 298 008c 02       		.uleb128 0x2
+ 299 008d 08       		.byte	0x8
+ 300 008e 04       		.byte	0x4
+ 301 008f F9000000 		.4byte	.LASF12
+ 302 0093 02       		.uleb128 0x2
+ 303 0094 01       		.byte	0x1
+ 304 0095 08       		.byte	0x8
+ 305 0096 CD000000 		.4byte	.LASF13
+ 306 009a 02       		.uleb128 0x2
+ 307 009b 04       		.byte	0x4
+ 308 009c 07       		.byte	0x7
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 8
+
+
+ 309 009d 1F010000 		.4byte	.LASF14
+ 310 00a1 05       		.uleb128 0x5
+ 311 00a2 01       		.byte	0x1
+ 312 00a3 9E000000 		.4byte	.LASF15
+ 313 00a7 01       		.byte	0x1
+ 314 00a8 1E       		.byte	0x1e
+ 315 00a9 01       		.byte	0x1
+ 316 00aa 00000000 		.4byte	.LFB33
+ 317 00ae 0E000000 		.4byte	.LFE33
+ 318 00b2 00000000 		.4byte	.LLST0
+ 319 00b6 01       		.byte	0x1
+ 320 00b7 05       		.uleb128 0x5
+ 321 00b8 01       		.byte	0x1
+ 322 00b9 A7000000 		.4byte	.LASF16
+ 323 00bd 01       		.byte	0x1
+ 324 00be 24       		.byte	0x24
+ 325 00bf 01       		.byte	0x1
+ 326 00c0 00000000 		.4byte	.LFB34
+ 327 00c4 0E000000 		.4byte	.LFE34
+ 328 00c8 2C000000 		.4byte	.LLST1
+ 329 00cc 01       		.byte	0x1
+ 330 00cd 05       		.uleb128 0x5
+ 331 00ce 01       		.byte	0x1
+ 332 00cf AF000000 		.4byte	.LASF17
+ 333 00d3 01       		.byte	0x1
+ 334 00d4 28       		.byte	0x28
+ 335 00d5 01       		.byte	0x1
+ 336 00d6 00000000 		.4byte	.LFB35
+ 337 00da 14000000 		.4byte	.LFE35
+ 338 00de 58000000 		.4byte	.LLST2
+ 339 00e2 01       		.byte	0x1
+ 340 00e3 06       		.uleb128 0x6
+ 341 00e4 01       		.byte	0x1
+ 342 00e5 85010000 		.4byte	.LASF18
+ 343 00e9 01       		.byte	0x1
+ 344 00ea 2F       		.byte	0x2f
+ 345 00eb 01       		.byte	0x1
+ 346 00ec 00000000 		.4byte	.LFB36
+ 347 00f0 14000000 		.4byte	.LFE36
+ 348 00f4 84000000 		.4byte	.LLST3
+ 349 00f8 01       		.byte	0x1
+ 350 00f9 07       		.uleb128 0x7
+ 351 00fa 01       		.byte	0x1
+ 352 00fb 1B000000 		.4byte	.LASF19
+ 353 00ff 01       		.byte	0x1
+ 354 0100 4A       		.byte	0x4a
+ 355 0101 61000000 		.4byte	0x61
+ 356 0105 00000000 		.4byte	.LFB37
+ 357 0109 50000000 		.4byte	.LFE37
+ 358 010d B0000000 		.4byte	.LLST4
+ 359 0111 01       		.byte	0x1
+ 360 0112 08       		.uleb128 0x8
+ 361 0113 C4000000 		.4byte	.LASF20
+ 362 0117 01       		.byte	0x1
+ 363 0118 11       		.byte	0x11
+ 364 0119 7A000000 		.4byte	0x7a
+ 365 011d 01       		.byte	0x1
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 9
+
+
+ 366 011e 05       		.byte	0x5
+ 367 011f 03       		.byte	0x3
+ 368 0120 00000000 		.4byte	ms_count
+ 369 0124 08       		.uleb128 0x8
+ 370 0125 D2000000 		.4byte	.LASF21
+ 371 0129 01       		.byte	0x1
+ 372 012a 12       		.byte	0x12
+ 373 012b 7A000000 		.4byte	0x7a
+ 374 012f 01       		.byte	0x1
+ 375 0130 05       		.byte	0x5
+ 376 0131 03       		.byte	0x3
+ 377 0132 00000000 		.4byte	comp_val1
+ 378 0136 08       		.uleb128 0x8
+ 379 0137 DC000000 		.4byte	.LASF22
+ 380 013b 01       		.byte	0x1
+ 381 013c 13       		.byte	0x13
+ 382 013d 7A000000 		.4byte	0x7a
+ 383 0141 01       		.byte	0x1
+ 384 0142 05       		.byte	0x5
+ 385 0143 03       		.byte	0x3
+ 386 0144 00000000 		.4byte	comp_val2
+ 387 0148 08       		.uleb128 0x8
+ 388 0149 8C010000 		.4byte	.LASF23
+ 389 014d 01       		.byte	0x1
+ 390 014e 14       		.byte	0x14
+ 391 014f 6F000000 		.4byte	0x6f
+ 392 0153 01       		.byte	0x1
+ 393 0154 05       		.byte	0x5
+ 394 0155 03       		.byte	0x3
+ 395 0156 00000000 		.4byte	increment
+ 396 015a 00       		.byte	0
+ 397              		.section	.debug_abbrev,"",%progbits
+ 398              	.Ldebug_abbrev0:
+ 399 0000 01       		.uleb128 0x1
+ 400 0001 11       		.uleb128 0x11
+ 401 0002 01       		.byte	0x1
+ 402 0003 25       		.uleb128 0x25
+ 403 0004 0E       		.uleb128 0xe
+ 404 0005 13       		.uleb128 0x13
+ 405 0006 0B       		.uleb128 0xb
+ 406 0007 03       		.uleb128 0x3
+ 407 0008 0E       		.uleb128 0xe
+ 408 0009 1B       		.uleb128 0x1b
+ 409 000a 0E       		.uleb128 0xe
+ 410 000b 55       		.uleb128 0x55
+ 411 000c 06       		.uleb128 0x6
+ 412 000d 11       		.uleb128 0x11
+ 413 000e 01       		.uleb128 0x1
+ 414 000f 52       		.uleb128 0x52
+ 415 0010 01       		.uleb128 0x1
+ 416 0011 10       		.uleb128 0x10
+ 417 0012 06       		.uleb128 0x6
+ 418 0013 00       		.byte	0
+ 419 0014 00       		.byte	0
+ 420 0015 02       		.uleb128 0x2
+ 421 0016 24       		.uleb128 0x24
+ 422 0017 00       		.byte	0
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 10
+
+
+ 423 0018 0B       		.uleb128 0xb
+ 424 0019 0B       		.uleb128 0xb
+ 425 001a 3E       		.uleb128 0x3e
+ 426 001b 0B       		.uleb128 0xb
+ 427 001c 03       		.uleb128 0x3
+ 428 001d 0E       		.uleb128 0xe
+ 429 001e 00       		.byte	0
+ 430 001f 00       		.byte	0
+ 431 0020 03       		.uleb128 0x3
+ 432 0021 24       		.uleb128 0x24
+ 433 0022 00       		.byte	0
+ 434 0023 0B       		.uleb128 0xb
+ 435 0024 0B       		.uleb128 0xb
+ 436 0025 3E       		.uleb128 0x3e
+ 437 0026 0B       		.uleb128 0xb
+ 438 0027 03       		.uleb128 0x3
+ 439 0028 08       		.uleb128 0x8
+ 440 0029 00       		.byte	0
+ 441 002a 00       		.byte	0
+ 442 002b 04       		.uleb128 0x4
+ 443 002c 16       		.uleb128 0x16
+ 444 002d 00       		.byte	0
+ 445 002e 03       		.uleb128 0x3
+ 446 002f 0E       		.uleb128 0xe
+ 447 0030 3A       		.uleb128 0x3a
+ 448 0031 0B       		.uleb128 0xb
+ 449 0032 3B       		.uleb128 0x3b
+ 450 0033 0B       		.uleb128 0xb
+ 451 0034 49       		.uleb128 0x49
+ 452 0035 13       		.uleb128 0x13
+ 453 0036 00       		.byte	0
+ 454 0037 00       		.byte	0
+ 455 0038 05       		.uleb128 0x5
+ 456 0039 2E       		.uleb128 0x2e
+ 457 003a 00       		.byte	0
+ 458 003b 3F       		.uleb128 0x3f
+ 459 003c 0C       		.uleb128 0xc
+ 460 003d 03       		.uleb128 0x3
+ 461 003e 0E       		.uleb128 0xe
+ 462 003f 3A       		.uleb128 0x3a
+ 463 0040 0B       		.uleb128 0xb
+ 464 0041 3B       		.uleb128 0x3b
+ 465 0042 0B       		.uleb128 0xb
+ 466 0043 27       		.uleb128 0x27
+ 467 0044 0C       		.uleb128 0xc
+ 468 0045 11       		.uleb128 0x11
+ 469 0046 01       		.uleb128 0x1
+ 470 0047 12       		.uleb128 0x12
+ 471 0048 01       		.uleb128 0x1
+ 472 0049 40       		.uleb128 0x40
+ 473 004a 06       		.uleb128 0x6
+ 474 004b 9642     		.uleb128 0x2116
+ 475 004d 0C       		.uleb128 0xc
+ 476 004e 00       		.byte	0
+ 477 004f 00       		.byte	0
+ 478 0050 06       		.uleb128 0x6
+ 479 0051 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 11
+
+
+ 480 0052 00       		.byte	0
+ 481 0053 3F       		.uleb128 0x3f
+ 482 0054 0C       		.uleb128 0xc
+ 483 0055 03       		.uleb128 0x3
+ 484 0056 0E       		.uleb128 0xe
+ 485 0057 3A       		.uleb128 0x3a
+ 486 0058 0B       		.uleb128 0xb
+ 487 0059 3B       		.uleb128 0x3b
+ 488 005a 0B       		.uleb128 0xb
+ 489 005b 27       		.uleb128 0x27
+ 490 005c 0C       		.uleb128 0xc
+ 491 005d 11       		.uleb128 0x11
+ 492 005e 01       		.uleb128 0x1
+ 493 005f 12       		.uleb128 0x12
+ 494 0060 01       		.uleb128 0x1
+ 495 0061 40       		.uleb128 0x40
+ 496 0062 06       		.uleb128 0x6
+ 497 0063 9742     		.uleb128 0x2117
+ 498 0065 0C       		.uleb128 0xc
+ 499 0066 00       		.byte	0
+ 500 0067 00       		.byte	0
+ 501 0068 07       		.uleb128 0x7
+ 502 0069 2E       		.uleb128 0x2e
+ 503 006a 00       		.byte	0
+ 504 006b 3F       		.uleb128 0x3f
+ 505 006c 0C       		.uleb128 0xc
+ 506 006d 03       		.uleb128 0x3
+ 507 006e 0E       		.uleb128 0xe
+ 508 006f 3A       		.uleb128 0x3a
+ 509 0070 0B       		.uleb128 0xb
+ 510 0071 3B       		.uleb128 0x3b
+ 511 0072 0B       		.uleb128 0xb
+ 512 0073 49       		.uleb128 0x49
+ 513 0074 13       		.uleb128 0x13
+ 514 0075 11       		.uleb128 0x11
+ 515 0076 01       		.uleb128 0x1
+ 516 0077 12       		.uleb128 0x12
+ 517 0078 01       		.uleb128 0x1
+ 518 0079 40       		.uleb128 0x40
+ 519 007a 06       		.uleb128 0x6
+ 520 007b 9642     		.uleb128 0x2116
+ 521 007d 0C       		.uleb128 0xc
+ 522 007e 00       		.byte	0
+ 523 007f 00       		.byte	0
+ 524 0080 08       		.uleb128 0x8
+ 525 0081 34       		.uleb128 0x34
+ 526 0082 00       		.byte	0
+ 527 0083 03       		.uleb128 0x3
+ 528 0084 0E       		.uleb128 0xe
+ 529 0085 3A       		.uleb128 0x3a
+ 530 0086 0B       		.uleb128 0xb
+ 531 0087 3B       		.uleb128 0x3b
+ 532 0088 0B       		.uleb128 0xb
+ 533 0089 49       		.uleb128 0x49
+ 534 008a 13       		.uleb128 0x13
+ 535 008b 3F       		.uleb128 0x3f
+ 536 008c 0C       		.uleb128 0xc
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 12
+
+
+ 537 008d 02       		.uleb128 0x2
+ 538 008e 0A       		.uleb128 0xa
+ 539 008f 00       		.byte	0
+ 540 0090 00       		.byte	0
+ 541 0091 00       		.byte	0
+ 542              		.section	.debug_loc,"",%progbits
+ 543              	.Ldebug_loc0:
+ 544              	.LLST0:
+ 545 0000 00000000 		.4byte	.LFB33
+ 546 0004 02000000 		.4byte	.LCFI0
+ 547 0008 0200     		.2byte	0x2
+ 548 000a 7D       		.byte	0x7d
+ 549 000b 00       		.sleb128 0
+ 550 000c 02000000 		.4byte	.LCFI0
+ 551 0010 04000000 		.4byte	.LCFI1
+ 552 0014 0200     		.2byte	0x2
+ 553 0016 7D       		.byte	0x7d
+ 554 0017 08       		.sleb128 8
+ 555 0018 04000000 		.4byte	.LCFI1
+ 556 001c 0E000000 		.4byte	.LFE33
+ 557 0020 0200     		.2byte	0x2
+ 558 0022 77       		.byte	0x77
+ 559 0023 08       		.sleb128 8
+ 560 0024 00000000 		.4byte	0
+ 561 0028 00000000 		.4byte	0
+ 562              	.LLST1:
+ 563 002c 00000000 		.4byte	.LFB34
+ 564 0030 02000000 		.4byte	.LCFI2
+ 565 0034 0200     		.2byte	0x2
+ 566 0036 7D       		.byte	0x7d
+ 567 0037 00       		.sleb128 0
+ 568 0038 02000000 		.4byte	.LCFI2
+ 569 003c 04000000 		.4byte	.LCFI3
+ 570 0040 0200     		.2byte	0x2
+ 571 0042 7D       		.byte	0x7d
+ 572 0043 08       		.sleb128 8
+ 573 0044 04000000 		.4byte	.LCFI3
+ 574 0048 0E000000 		.4byte	.LFE34
+ 575 004c 0200     		.2byte	0x2
+ 576 004e 77       		.byte	0x77
+ 577 004f 08       		.sleb128 8
+ 578 0050 00000000 		.4byte	0
+ 579 0054 00000000 		.4byte	0
+ 580              	.LLST2:
+ 581 0058 00000000 		.4byte	.LFB35
+ 582 005c 02000000 		.4byte	.LCFI4
+ 583 0060 0200     		.2byte	0x2
+ 584 0062 7D       		.byte	0x7d
+ 585 0063 00       		.sleb128 0
+ 586 0064 02000000 		.4byte	.LCFI4
+ 587 0068 04000000 		.4byte	.LCFI5
+ 588 006c 0200     		.2byte	0x2
+ 589 006e 7D       		.byte	0x7d
+ 590 006f 08       		.sleb128 8
+ 591 0070 04000000 		.4byte	.LCFI5
+ 592 0074 14000000 		.4byte	.LFE35
+ 593 0078 0200     		.2byte	0x2
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 13
+
+
+ 594 007a 77       		.byte	0x77
+ 595 007b 08       		.sleb128 8
+ 596 007c 00000000 		.4byte	0
+ 597 0080 00000000 		.4byte	0
+ 598              	.LLST3:
+ 599 0084 00000000 		.4byte	.LFB36
+ 600 0088 02000000 		.4byte	.LCFI6
+ 601 008c 0200     		.2byte	0x2
+ 602 008e 7D       		.byte	0x7d
+ 603 008f 00       		.sleb128 0
+ 604 0090 02000000 		.4byte	.LCFI6
+ 605 0094 04000000 		.4byte	.LCFI7
+ 606 0098 0200     		.2byte	0x2
+ 607 009a 7D       		.byte	0x7d
+ 608 009b 08       		.sleb128 8
+ 609 009c 04000000 		.4byte	.LCFI7
+ 610 00a0 14000000 		.4byte	.LFE36
+ 611 00a4 0200     		.2byte	0x2
+ 612 00a6 77       		.byte	0x77
+ 613 00a7 08       		.sleb128 8
+ 614 00a8 00000000 		.4byte	0
+ 615 00ac 00000000 		.4byte	0
+ 616              	.LLST4:
+ 617 00b0 00000000 		.4byte	.LFB37
+ 618 00b4 02000000 		.4byte	.LCFI8
+ 619 00b8 0200     		.2byte	0x2
+ 620 00ba 7D       		.byte	0x7d
+ 621 00bb 00       		.sleb128 0
+ 622 00bc 02000000 		.4byte	.LCFI8
+ 623 00c0 04000000 		.4byte	.LCFI9
+ 624 00c4 0200     		.2byte	0x2
+ 625 00c6 7D       		.byte	0x7d
+ 626 00c7 08       		.sleb128 8
+ 627 00c8 04000000 		.4byte	.LCFI9
+ 628 00cc 50000000 		.4byte	.LFE37
+ 629 00d0 0200     		.2byte	0x2
+ 630 00d2 77       		.byte	0x77
+ 631 00d3 08       		.sleb128 8
+ 632 00d4 00000000 		.4byte	0
+ 633 00d8 00000000 		.4byte	0
+ 634              		.section	.debug_aranges,"",%progbits
+ 635 0000 3C000000 		.4byte	0x3c
+ 636 0004 0200     		.2byte	0x2
+ 637 0006 00000000 		.4byte	.Ldebug_info0
+ 638 000a 04       		.byte	0x4
+ 639 000b 00       		.byte	0
+ 640 000c 0000     		.2byte	0
+ 641 000e 0000     		.2byte	0
+ 642 0010 00000000 		.4byte	.LFB33
+ 643 0014 0E000000 		.4byte	.LFE33-.LFB33
+ 644 0018 00000000 		.4byte	.LFB34
+ 645 001c 0E000000 		.4byte	.LFE34-.LFB34
+ 646 0020 00000000 		.4byte	.LFB35
+ 647 0024 14000000 		.4byte	.LFE35-.LFB35
+ 648 0028 00000000 		.4byte	.LFB36
+ 649 002c 14000000 		.4byte	.LFE36-.LFB36
+ 650 0030 00000000 		.4byte	.LFB37
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 14
+
+
+ 651 0034 50000000 		.4byte	.LFE37-.LFB37
+ 652 0038 00000000 		.4byte	0
+ 653 003c 00000000 		.4byte	0
+ 654              		.section	.debug_ranges,"",%progbits
+ 655              	.Ldebug_ranges0:
+ 656 0000 00000000 		.4byte	.LFB33
+ 657 0004 0E000000 		.4byte	.LFE33
+ 658 0008 00000000 		.4byte	.LFB34
+ 659 000c 0E000000 		.4byte	.LFE34
+ 660 0010 00000000 		.4byte	.LFB35
+ 661 0014 14000000 		.4byte	.LFE35
+ 662 0018 00000000 		.4byte	.LFB36
+ 663 001c 14000000 		.4byte	.LFE36
+ 664 0020 00000000 		.4byte	.LFB37
+ 665 0024 50000000 		.4byte	.LFE37
+ 666 0028 00000000 		.4byte	0
+ 667 002c 00000000 		.4byte	0
+ 668              		.section	.debug_line,"",%progbits
+ 669              	.Ldebug_line0:
+ 670 0000 B3000000 		.section	.debug_str,"MS",%progbits,1
+ 670      02004500 
+ 670      00000201 
+ 670      FB0E0D00 
+ 670      01010101 
+ 671              	.LASF6:
+ 672 0000 6C6F6E67 		.ascii	"long long int\000"
+ 672      206C6F6E 
+ 672      6720696E 
+ 672      7400
+ 673              	.LASF8:
+ 674 000e 756E7369 		.ascii	"unsigned int\000"
+ 674      676E6564 
+ 674      20696E74 
+ 674      00
+ 675              	.LASF19:
+ 676 001b 6D61696E 		.ascii	"main\000"
+ 676      00
+ 677              	.LASF24:
+ 678 0020 474E5520 		.ascii	"GNU C 4.7.3 20130312 (release) [ARM/embedded-4_7-br"
+ 678      4320342E 
+ 678      372E3320 
+ 678      32303133 
+ 678      30333132 
+ 679 0053 616E6368 		.ascii	"anch revision 196615]\000"
+ 679      20726576 
+ 679      6973696F 
+ 679      6E203139 
+ 679      36363135 
+ 680              	.LASF9:
+ 681 0069 75696E74 		.ascii	"uint8\000"
+ 681      3800
+ 682              	.LASF5:
+ 683 006f 6C6F6E67 		.ascii	"long unsigned int\000"
+ 683      20756E73 
+ 683      69676E65 
+ 683      6420696E 
+ 683      7400
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 15
+
+
+ 684              	.LASF7:
+ 685 0081 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 685      206C6F6E 
+ 685      6720756E 
+ 685      7369676E 
+ 685      65642069 
+ 686              	.LASF11:
+ 687 0098 666C6F61 		.ascii	"float\000"
+ 687      7400
+ 688              	.LASF15:
+ 689 009e 424C5545 		.ascii	"BLUE_ISR\000"
+ 689      5F495352 
+ 689      00
+ 690              	.LASF16:
+ 691 00a7 5245445F 		.ascii	"RED_ISR\000"
+ 691      49535200 
+ 692              	.LASF17:
+ 693 00af 54435F49 		.ascii	"TC_ISR\000"
+ 693      535200
+ 694              	.LASF1:
+ 695 00b6 756E7369 		.ascii	"unsigned char\000"
+ 695      676E6564 
+ 695      20636861 
+ 695      7200
+ 696              	.LASF20:
+ 697 00c4 6D735F63 		.ascii	"ms_count\000"
+ 697      6F756E74 
+ 697      00
+ 698              	.LASF13:
+ 699 00cd 63686172 		.ascii	"char\000"
+ 699      00
+ 700              	.LASF21:
+ 701 00d2 636F6D70 		.ascii	"comp_val1\000"
+ 701      5F76616C 
+ 701      3100
+ 702              	.LASF22:
+ 703 00dc 636F6D70 		.ascii	"comp_val2\000"
+ 703      5F76616C 
+ 703      3200
+ 704              	.LASF4:
+ 705 00e6 6C6F6E67 		.ascii	"long int\000"
+ 705      20696E74 
+ 705      00
+ 706              	.LASF2:
+ 707 00ef 73686F72 		.ascii	"short int\000"
+ 707      7420696E 
+ 707      7400
+ 708              	.LASF12:
+ 709 00f9 646F7562 		.ascii	"double\000"
+ 709      6C6500
+ 710              	.LASF3:
+ 711 0100 73686F72 		.ascii	"short unsigned int\000"
+ 711      7420756E 
+ 711      7369676E 
+ 711      65642069 
+ 711      6E7400
+ 712              	.LASF0:
+ARM GAS  C:\Users\CAROLI~1\AppData\Local\Temp\cc8lgy2a.s 			page 16
+
+
+ 713 0113 7369676E 		.ascii	"signed char\000"
+ 713      65642063 
+ 713      68617200 
+ 714              	.LASF14:
+ 715 011f 73697A65 		.ascii	"sizetype\000"
+ 715      74797065 
+ 715      00
+ 716              	.LASF25:
+ 717 0128 2E5C6D61 		.ascii	".\\main.c\000"
+ 717      696E2E63 
+ 717      00
+ 718              	.LASF10:
+ 719 0131 75696E74 		.ascii	"uint16\000"
+ 719      313600
+ 720              	.LASF26:
+ 721 0138 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Downloads\\[NATCAR"
+ 721      77617265 
+ 721      2D686F73 
+ 721      745C5368 
+ 721      61726564 
+ 722 0166 5D205053 		.ascii	"] PSoC LED PWM\\Timer_PWM.cydsn\000"
+ 722      6F43204C 
+ 722      45442050 
+ 722      574D5C54 
+ 722      696D6572 
+ 723              	.LASF18:
+ 724 0185 4D535F49 		.ascii	"MS_ISR\000"
+ 724      535200
+ 725              	.LASF23:
+ 726 018c 696E6372 		.ascii	"increment\000"
+ 726      656D656E 
+ 726      7400
+ 727              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.7.3 20130312 (release) [ARM/embedded-4_7-br
